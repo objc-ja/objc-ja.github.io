@@ -11,9 +11,10 @@
 	{% endif %}
 	<meta name="author" content="{{ site.author.name }}">
 	<link href='{{ ASSET_PATH }}/css/stylesheet.css' rel="stylesheet" media="all">
-	<link href='{{ ASSET_PATH }}/css/pygment_trac.css' rel="stylesheet" media="all">
 	<link href="http://feeds.feedburner.com/{{ site.author.feedbaname }}" rel="alternate" title="{{ page.title }}" type="application/atom+xml">
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.0.6/modernizr.min.js"></script>
+	<link rel="stylesheet" href="{{ ASSET_PATH }}/highlight/xcode.css">
+	<script src="{{ ASSET_PATH }}/highlight/highlight.pack.js"></script>
 </head>
 <body>
 
@@ -66,11 +67,7 @@
 
 	{% include JB/analytics %}
 
-	<script type="text/javascript" src="http://wcs.naver.net/wcslog.js"></script>
-	<script type="text/javascript">
-		if(!wcs_add) var wcs_add = {};
-		wcs_add["wa"] = "a7768d103fade8";
-		wcs_do();
-	</script>
+	<script>hljs.initHighlightingOnLoad();</script>
+
 </body>
 </html>
