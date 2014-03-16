@@ -1,14 +1,16 @@
 ---
 layout: post
 title: "軽量なView Controller"
-description: ""
 category: issue-1
-tags: []
+original:
+  title: "Lighter View Controllers"
+  url: http://www.objc.io/issue-1/lighter-view-controllers.html
+  author: "Chris Eidhof"
+translator:
+  name: "@gonsee"
+  url: http://twitter.com/gonsee
 ---
 {% include JB/setup %}
-
-原文：[Lighter View Controllers](http://www.objc.io/issue-1/lighter-view-controllers.html)  by Chris Eidhof  
-翻訳：佐藤新悟 ([@gonsee](http://twitter.com/gonsee))
 
 view controllerはiOSプロジェクトの中で一番大きいファイルになりがちで、必要以上に多くのコードを含んでいることが多い。ほぼ決まってView Controllerはコードの中で最も再利用性の低い部分だ。View Controllerをスリムにし、再利用可能にして、より適切な場所にコードを移すテクニックを見ていこう。
 

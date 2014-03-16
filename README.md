@@ -1,40 +1,55 @@
-# Jekyll-Bootstrap
+# objc.io 日本語訳
 
-The quickest way to start and publish your Jekyll powered blog. 100% compatible with GitHub pages
+## 概要
 
-## Usage
+[objc.io](http://www.objc.io)の翻訳を公開しています。[こちら](http://objc-ja.github.io)から翻訳記事を閲覧できます。
 
-For all usage and documentation please see: <http://jekyllbootstrap.com>
+## 記事の書き方
 
-## Version
+GitHub Pages、Jekyll、Jekyll Bootstrapを利用しています。記事を書くにはまずJekyllをインストールしてください。
 
-0.3.0 - stable and versioned using [semantic versioning](http://semver.org/).
+```
+$ gem install jekyll
+```
 
-**NOTE:** 0.3.0 introduces a new theme which is not backwards compatible in the sense it won't _look_ like the old version.
-However, the actual API has not changed at all.
-You might want to run 0.3.0 in a branch to make sure you are ok with the theme design changes.
+### 公開前のドラフト
 
-## Contributing
+`_drafts`ディレクトリの下に`article-title.md`のようなファイル名でファイルを作ります。`article-title`の部分が記事のURLになります。記事の中身は以下のテンプレートにそって記述してください。
 
+```
+---
+layout: post
+title: "軽量なView Controller"
+category: issue-1
+original:
+  title: "Lighter View Controllers"
+  url: http://www.objc.io/issue-1/lighter-view-controllers.html
+  author: "Chris Eidhof"
+translator:
+  name: "@gonsee"
+  url: http://twitter.com/gonsee
+---
+{% include JB/setup %}
 
-To contribute to the framework please make sure to checkout your branch based on `jb-development`!!
-This is very important as it allows me to accept your pull request without having to publish a public version release.
+以下、記事の中身
+```
 
-Small, atomic Features, bugs, etc.
-Use the `jb-development` branch but note it will likely change fast as pull requests are accepted.
-Please rebase as often as possible when working.
-Work on small, atomic features/bugs to avoid upstream commits affecting/breaking your development work.
+上記ファイルを用意して、リポジトリのルートで
 
-For Big Features or major API extensions/edits:
-This is the one case where I'll accept pull-requests based off the master branch.
-This allows you to work in isolation but it means I'll have to manually merge your work into the next public release.
-Translation : it might take a bit longer so please be patient! (but sincerely thank you).
+```
+$ jekyll serve --drafts
+```
 
-**Jekyll-Bootstrap Documentation Website.**
+とすると、[http://localhost:4000](http://localhost:4000)でサイトの見え方を確認できます。修正を反映するには再度`jekyll serve`するか、`--watch`オプションをつけて自動更新を有効にしておきます。
 
-The documentation website at <http://jekyllbootstrap.com> is maintained at https://github.com/plusjade/jekyllbootstrap.com
+記事を書いたらcommitしてpushします。ドラフトの状態では記事は表に公開されません。この状態でレビューしましょう。
 
+### 記事の公開
 
-## License
+レビュー後の記事は`_posts`ディレクトリの下に`YYYY-MM-DD-article-title.md`のようなファイル名にリネームして置きます。日付部分が記事の投稿日になります。
 
-[MIT](http://opensource.org/licenses/MIT)
+```
+$ jekyll serve
+```
+
+して、[http://localhost:4000](http://localhost:4000)にアクセスすれば公開後の状態を確認できます。問題なければpushしてください。記事が公開されます。

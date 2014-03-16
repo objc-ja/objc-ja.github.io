@@ -1,14 +1,16 @@
 ---
 layout: post
 title: "クリーンなTable Viewのコード"
-description: ""
 category: issue-1
-tags: []
+original:
+  title: "Clean table view code"
+  url: http://www.objc.io/issue-1/table-views.html
+  author: Florian Kugler
+translator:
+  name: "@gonsee"
+  url: http://twitter.com/gonsee
 ---
 {% include JB/setup %}
-
-原文：[Clean table view code](http://www.objc.io/issue-1/table-views.html) by Florian Kugler  
-翻訳：佐藤新悟 ([@gonsee](http://twitter.com/gonsee))
 
 table viewはiOSアプリにとって非常に用途の広い部品である。そのため多くのコードが直接的または間接的にtable viewに関連している。データの提供、table viewの更新、振る舞いの制御、選択時の反応などはその一部だ。本稿ではこのようなコードをクリーンでよく整理された形に保つためのテクニックを紹介する。
 
