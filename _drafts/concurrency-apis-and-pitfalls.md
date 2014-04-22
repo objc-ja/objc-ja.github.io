@@ -26,9 +26,9 @@ translator:
 
 両方のスレッドが同時にこれをやろうとしたときに生じうる危険を想像してください。例えば、スレッドAとスレッドBの両方がカウンターの値——ここでは17としましょう——をメモリに読み出し、スレッドAがカウンターを1増やして18をメモリに書き込んだとします。同時にスレッドBもカウンターを1増やして、スレッドAのすぐ後に18をメモリーに書き込んだとします。この時点でデータは壊れてしまいます。17から2回カウンターを増やしているのに値は18になってしまっているからです。
 
-![Race condition](http://www.objc.io/images/issue-2/race-condition@2x.png)
+![競合状態](http://www.objc.io/images/issue-2/race-condition@2x.png)
 
-この問題は[race condition](http://ja.wikipedia.org/wiki/競合状態)と呼ばれ、あるスレッドがリソースへアクセスする前に他のスレッドがリソースを使っていないか確認することなしに、複数スレッドでリソースを共有すると必ず発生します。単純な整数型ではなくより複雑な構造体を扱っている場合、メモリに書き込み中に他のスレッドが読みにきて、一部は新しくて、一部は古い、または初期化されていないデータになっているというようなことも起こりえます。これを防ぐためには、複数のスレッドは共有リソースに対し相互排他的にアクセスする必要があります。
+この問題は[競合状態](http://ja.wikipedia.org/wiki/競合状態)と呼ばれ、あるスレッドがリソースへアクセスする前に他のスレッドがリソースを使っていないか確認することなしに、複数スレッドでリソースを共有すると必ず発生します。単純な整数型ではなくより複雑な構造体を扱っている場合、メモリに書き込み中に他のスレッドが読みにきて、一部は新しくて、一部は古い、または初期化されていないデータになっているというようなことも起こりえます。これを防ぐためには、複数のスレッドは共有リソースに対し相互排他的にアクセスする必要があります。
 
 実際には状況はさらに複雑です。なぜなら最近のCPUは最適化のためにメモリへの読み込み、書き込みの順序を変えるからです。（[out-of-oder execution](http://ja.wikipedia.org/wiki/アウト・オブ・オーダー実行)）
 
@@ -40,7 +40,7 @@ translator:
 
 相互排他アクセスを保証するのに加え、ロックはout-of-order executionに起因する問題についても対処する必要があります。CPUがプログラムの命令通りの順序でメモリへのアクセスを行うことが保証できない場合、相互排他アクセスだけでは不十分です。このCPU最適化の副作用のワークアラウンドとして[メモリバリア](http://en.wikipedia.org/wiki/Memory_barrier)が使われます。メモリバリアを使うと、バリアを超えてout-of-order executionが起こらないことを保証できます。
 
-もちろんmutex lockの実装そのものもrace conditionが起きないようにする必要があります。これは簡単な仕事ではなく、モダンなCPUに対する特別な命令を利用する必要があります。atomic operationについてはDanielの[low-level concurrency techniques](http://www.objc.io/issue-2/low-level-concurrency-apis.html)の記事が詳しいです。
+もちろんmutex lockの実装そのものも競合状態が起きないようにする必要があります。これは簡単な仕事ではなく、モダンなCPUに対する特別な命令を利用する必要があります。atomic operationについてはDanielの[low-level concurrency techniques](http://www.objc.io/issue-2/low-level-concurrency-apis.html)の記事が詳しいです。
 
 Objective-Cのプロパティはatomicとして宣言することで、言語レベルのロックの仕組みが利用できます。実際プロパティはデフォルトでatomicになります。atomicとしてプロパティを宣言すると、プロパティにアクセスするたびにロックとロック解除が走ることになります。念のため全てのプロパティをatomicとして宣言しておきたくなるかもしれません。しかしロックにはコストが付いてきます。
 
@@ -53,6 +53,37 @@ Objective-Cのプロパティはatomicとして宣言することで、言語レ
 並行に実行させるつもりが、共有リソースのロックの仕方のせいで、実際には一度に１つのスレッドしかアクティブにならないようなコードを見かけることがよくあります。自分の書いたコードがマルチコア環境でどのようにスケジュールされるかを予測することはたいてい難しいです。Instrumentsの[CPU strategy view](http://developer.apple.com/library/mac/#documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/AnalysingCPUUsageinYourOSXApp/AnalysingCPUUsageinYourOSXApp.html)を利用してCPUコアを効率よく利用しているかどうかを見ることができます。
 
 ### デッドロック
+
+mutex lockは競合状態を解決しますが、残念ながら同時にもうひとつの問題（[いくつかある中のひとつ](http://en.wikipedia.org/wiki/Lock_%28computer_science%29#The_problems_with_locks)）を生み出します。デッドロックです。デッドロックは複数のスレッドが互いの終了を待って止まってしまうことで発生します。
+
+![デッドロック](http://www.objc.io/images/issue-2/dead-lock@2x.png)
+
+以下のコードの例を見てみましょう。これは２つの値を入れ替えるものです。
+
+```objc
+void swap(A, B)
+{
+    lock(lockA);
+    lock(lockB);
+    int a = A;
+    int b = B;
+    A = b;
+    B = a;
+    unlock(lockB);
+    unlock(lockA);
+}
+```
+
+これはたいていの場合うまくいきます。しかしたまたま２つのスレッドが同時に、逆の値の組で読んだ場合、
+
+```objc
+swap(X, Y); // thread 1
+swap(Y, X); // thread 2
+```
+
+デッドロックが発生します。スレッド１がXに対するロックを獲得し、スレッド２がYに対するロックを獲得します。ここで両スレッドは互いを待つ状態になりますが、ロックを獲得することはありません。
+
+
 
 ### Starvation
 
