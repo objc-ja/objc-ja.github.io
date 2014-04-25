@@ -60,22 +60,26 @@ mutex lockは競合状態を解決しますが、残念ながら同時にもう�
 
 以下のコードの例を見てみましょう。これは２つの値を入れ替えるものです。
 
-	void swap(A, B)
-	{
-	    lock(lockA);
-	    lock(lockB);
-	    int a = A;
-	    int b = B;
-	    A = b;
-	    B = a;
-	    unlock(lockB);
-	    unlock(lockA);
-	}
+```c
+void swap(A, B)
+{
+    lock(lockA);
+    lock(lockB);
+    int a = A;
+    int b = B;
+    A = b;
+    B = a;
+    unlock(lockB);
+    unlock(lockA);
+}
+```
 
 これはたいていの場合うまくいきます。しかしたまたま２つのスレッドが同時に、逆の値の組で呼んだ場合、
 
-	swap(X, Y); // thread 1
-	swap(Y, X); // thread 2
+```c
+swap(X, Y); // thread 1
+swap(Y, X); // thread 2
+```
 
 デッドロックが発生します。スレッド１がXに対するロックを獲得し、スレッド２がYに対するロックを獲得します。ここで両スレッドはお互いのロックを待つ状態になりますが、ロックを獲得することはありません。
 
